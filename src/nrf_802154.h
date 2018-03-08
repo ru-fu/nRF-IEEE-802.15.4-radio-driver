@@ -263,7 +263,7 @@ bool nrf_802154_receive(void);
  * @brief Change radio state to transmit.
  *
  * @note If the CPU is halted or interrupted while this function is executed, 
- *       @ref nrf_802154_transmitted or @ref nrf_802154_transmit_failed must be
+ *       @ref nrf_802154_transmitted or @ref nrf_802154_transmit_failed may be
  *       called before this function returns a result.
  * @note This function is implemented in zero-copy fashion. It passes the given buffer pointer to
  *       the RADIO peripheral.
@@ -346,8 +346,7 @@ bool nrf_802154_transmit(const uint8_t * p_data, uint8_t length, bool cca);
  * In energy detection state, the radio detects the maximum energy for a given time. The result of the detection
  * is reported to the higher layer by @ref nrf_802154_energy_detected.
  *
- * @note @ref nrf_802154_energy_detected may be called before this function
- *       returns a result.
+ * @note @ref nrf_802154_energy_detected may be called before this function returns a result.
  * @note Performing the energy detection procedure make take longer time than requested in @p time_us.
  *       The procedure is performed only during timeslots granted by a radio arbiter. It may be
  *       interrupted by other protocols using the radio hardware. If the procedure is interrupted, it is
@@ -526,7 +525,8 @@ extern void nrf_802154_receive_failed(nrf_802154_rx_error_t error);
 /**
  * @brief Notify that transmitting a frame has started.
  *
- * @note It is possible that the transmit procedure is interrupted and
+ * @note Usually, @ref nrf_802154_transmitted is called shortly after this function.
+ *       However, if the transmit procedure is interrupted, it might happen that 
  *       @ref nrf_802154_transmitted is not called.
  * @note This function should be very short to prevent dropping frames by the driver.
  *
@@ -543,8 +543,7 @@ extern void nrf_802154_tx_started(const uint8_t * p_frame);
  *       received. If ACK was not requested, this function is called just after transmission has
  *       ended.
  * @note The buffer pointed to by @p p_ack is not modified by the radio driver (and cannot
- *       be used to receive a frame) until @ref nrf_802154_buffer_free_raw is
- *       called.
+ *       be used to receive a frame) until @ref nrf_802154_buffer_free_raw is called.
  * @note The buffer pointed to by @p p_ack may be modified by the function handler (and other
  *       modules) until @ref nrf_802154_buffer_free_raw is called.
  *
